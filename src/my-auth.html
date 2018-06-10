@@ -1,0 +1,72 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-app.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="my-auth">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+
+                padding: 10px;
+            }
+        </style>
+
+        <div class="card">
+
+            <template is="dom-if" if="{{user}}">
+                <h1>You are logged in: {{user.uid}}</h1>
+            </template>
+            <firebase-app
+                    auth-domain="project246-d029c.firebaseapp.com"
+                    database-url="https://project246-d029c.firebaseio.com"
+                    api-key="AIzaSyDo5moxxhDtLteoFZplX-KOFiUaIsOZ8jQ"
+                    storage-bucket="project246-d029c.appspot.com"
+                    messaging-sender-id="669421829425"
+                    project-id="project246-d029c">
+            </firebase-app>
+            <firebase-auth id="auth" user="{{user}}" provider="google" on-error="handleError">
+            </firebase-auth>
+            <paper-button raised on-tap="login" hidden$="[[user]]">Sign In</paper-button>
+            <paper-button raised on-tap="logout" hidden$="[[!user]]">Sign Out</paper-button>
+
+
+        </div>
+    </template>
+
+    <script>
+        class MyAuth extends Polymer.Element {
+            static get is() { return 'my-auth'; }
+            static get properties() {
+                return {
+                user:{
+                    type:Object,
+                    notify: true
+                }
+                }
+            }
+            login(){
+                return this.$.auth.signInWithPopup();
+            }
+
+            logout(){
+                return this.$.auth.signOut()
+            }
+        }
+
+        window.customElements.define(MyAuth.is, MyAuth);
+    </script>
+</dom-module>

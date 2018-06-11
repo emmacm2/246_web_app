@@ -1,0 +1,43 @@
+//Site Admins
+Admins
+   Uid:True
+
+Customers
+   CustomerId
+      Name
+      Logo Url
+      Primary Color
+      Secondary Color
+      Admins
+        Uid:true
+
+Positions
+    CustomerId
+       PositionId
+         Position Name : value
+         Modules:[moduleIds]
+
+Modules
+    CustomerId
+        ModuleId: Module Name
+          Type: YoutubeURL / HTML
+          Data: value
+          Questions:[questionIds]
+
+
+Questions
+    CustomerId
+        QuestionId
+            QuestionText: value
+            Answer: value
+            Choices: [values]
+
+Users
+    CustomerId
+            UserId
+             Name: value
+             Email: value
+             Positions:
+               positionId
+                 Answers
+                   QuestionId:answer

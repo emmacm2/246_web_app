@@ -3,11 +3,13 @@
   "shell": "src/my-app.html",
   "fragments": [
     "src/splash-screen.html",
+    "src/my-settings.html",
     "src/my-auth.html",
-    "src/my-view1.html",
-    "src/my-view2.html",
-    "src/my-view3.html",
-    "src/my-view404.html"
+    "src/my-positions.html",
+    "src/my-modules.html",
+    "src/my-employees.html",
+    "src/my-view404.html",
+    "src/my-organization.html"
   ],
   "sources": [
     "images/**/*",

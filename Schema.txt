@@ -3,11 +3,15 @@ Admins
    Uid:True
 
 Customers
+   Uid
+    CustomerOrgId
+Customers-Orgs
    CustomerId
-      Name
-      Logo Url
-      Primary Color
-      Secondary Color
+      Public
+        Name
+        Logo Url
+        Primary Color
+        Secondary Color
       Admins
         Uid:true
 
@@ -35,9 +39,89 @@ Questions
 Users
     CustomerId
             UserId
-             Name: value
-             Email: value
+             Public
+              Name: value
+              Email: value
              Positions:
                positionId
                  Answers
                    QuestionId:answer
+
+
+RULES
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "Admins":{
+      ".read": "root.child('Admins').child(auth.uid).val() === true",
+      ".write": "root.child('Admins').child(auth.uid).val() === true"
+    },
+    "Customers":{
+      ".read": "root.child('Admins').child(auth.uid).val() === true",
+      ".write": "root.child('Admins').child(auth.uid).val() === true",
+      "$CustomerId":{
+        ".read": "root.child('Customers').child($CustomerId).child('Admins').child(auth.uid).val() === true",
+        ".write": "root.child('Customers').child($CustomerId).child('Admins').child(auth.uid).val() === true",
+        "Public":{
+          ".read":"true"
+        }
+      }
+    },
+       "Positions":{
+         ".read": "root.child('Admins').child(auth.uid).val() === true",
+         ".write": "root.child('Admins').child(auth.uid).val() === true",
+         "$CustomerId":{
+           ".read": "root.child('Customers').child($CustomerId).child('Admins').child(auth.uid).val() === true",
+           ".write": "root.child('Customers').child($CustomerId).child('Admins').child(auth.uid).val() === true",
+           "$PositionId":{
+             ".read":"root.child('Users').child($CustomerId).hasChild(auth.uid)"
+           }
+         }
+       },
+       "Modules":{
+         ".read": "root.child('Admins').child(auth.uid).val() === true",
+         ".write": "root.child('Admins').child(auth.uid).val() === true",
+         "$CustomerId":{
+           ".read": "root.child('Customers').child($CustomerId).child('Admins').child(auth.uid).val() === true",
+           ".write": "root.child('Customers').child($CustomerId).child('Admins').child(auth.uid).val() === true",
+           "$ModuleId":{
+             ".read":"root.child('Users').child($CustomerId).hasChild(auth.uid)"
+           }
+         }
+        },
+        "Questions":{
+         ".read": "root.child('Admins').child(auth.uid).val() === true",
+         ".write": "root.child('Admins').child(auth.uid).val() === true",
+         "$CustomerId":{
+           ".read": "root.child('Customers').child($CustomerId).child('Admins').child(auth.uid).val() === true",
+           ".write": "root.child('Customers').child($CustomerId).child('Admins').child(auth.uid).val() === true",
+           "$QuestionId":{
+             ".read":"root.child('Users').child($CustomerId).hasChild(auth.uid)"
+           }
+         }
+       },
+       "Users":{
+         ".read": "root.child('Admins').child(auth.uid).val() === true",
+         ".write": "root.child('Admins').child(auth.uid).val() === true",
+           "$CustomerId":{
+           ".read": "root.child('Customers').child($CustomerId).child('Admins').child(auth.uid).val() === true",
+           ".write": "root.child('Customers').child($CustomerId).child('Admins').child(auth.uid).val() === true",
+            "$UserId":{
+              "Public":{
+                ".read": "$UserId === auth.uid",
+                ".write":"$UserId === auth.uid"
+               },
+               "Assigned_Position":{
+                   ".read": "$UserId === auth.uid",
+                  "$PositionId":{
+                    "Answers":{
+                      ".write":"$UserId === auth.uid"
+                    }
+                  }
+              }
+            }
+          }
+        }
+      }
+    }

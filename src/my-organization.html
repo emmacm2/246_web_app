@@ -1,0 +1,135 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="../bower_components/paper-swatch-picker/paper-swatch-picker.html">
+<link rel="import" href="../bower_components/neon-animation/web-animations.html">
+
+
+<dom-module id="my-organization">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                padding: 10px;
+
+            }
+
+            .logo{
+                width: 25%;
+                height: 25%;
+            }
+        </style>
+
+        <div class="card">
+
+            <h1>Organization Settings</h1>
+
+            <firebase-document
+                    app-name="cabooseBE"
+                    path="/Customers/[[user.uid]]/CustomerOrgId"
+                    data="{{orgId}}">
+            </firebase-document>
+
+            <firebase-document
+                    app-name="cabooseBE"
+                    path="/Customer_Orgs/[[orgId]]/Public/name"
+                    data="{{orgName}}">
+            </firebase-document>
+
+            <firebase-document
+                    app-name="cabooseBE"
+                    path="/Customer_Orgs/[[orgId]]/Public/Primary_Color"
+                    data="{{primaryColor}}">
+            </firebase-document>
+
+            <firebase-document
+                    app-name="cabooseBE"
+                    path="/Customer_Orgs/[[orgId]]/Public/Secondary_Color"
+                    data="{{secondaryColor}}">
+            </firebase-document>
+
+            <firebase-document
+                    app-name="cabooseBE"
+                    path="/Customer_Orgs/[[orgId]]/Public/Logo_Url"
+                    data="{{urlData}}">
+            </firebase-document>
+
+
+
+
+            <template is="dom-if" if="[[user]]">
+                <paper-input always-float-label label="Company Name" value="{{orgName}}"></paper-input>
+
+                <p><img class ="logo" src="[[urlData]]"></p>
+                <paper-input always-float-label label="Company Logo Url" value="{{urlData}}"></paper-input>
+
+                <p>Primary Color</p>
+                <paper-swatch-picker color="{{primaryColor}}"></paper-swatch-picker>
+
+                <p>Secondary Color</p>
+                <paper-swatch-picker color="{{secondaryColor}}"></paper-swatch-picker>
+
+
+            </template>
+
+
+
+    </template>
+
+    <template is="dom-if" if="[[!user]]">
+
+        <p>Please Log In</p>
+
+    </template>
+
+
+    </div>
+    </template>
+
+    <script>
+        class MyOrganization extends Polymer.Element {
+            static get is() {
+                return 'my-organization';
+            }
+
+            static get properties() {
+                return {
+                    user:{
+                        type: Object
+                    },
+                    urlData:{
+                        type: String
+                    },
+                    orgName:{
+                        type: String
+                    },
+                    primaryColor:{
+                        type: Object
+                    },
+                    secondaryColor:{
+                        type: String
+                    },
+                    orgId: {
+                        type: String,
+                        value:"Caboose-Internal"
+                },
+
+                };
+            }
+        }
+
+        window.customElements.define(MyOrganization.is, MyOrganization);
+    </script>
+</dom-module>

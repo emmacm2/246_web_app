@@ -23,211 +23,226 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-auth.html">
+
 
 <link rel="import" href="my-icons.html">
 <link rel="import" href="my-auth.html">
 
-
+<link rel="lazy-import" href="my-organization.html">
+<link rel="lazy-import" href="my-settings.html">
 <link rel="lazy-import" href="my-home.html">
-<link rel="lazy-import" href="my-view1.html">
-<link rel="lazy-import" href="my-view2.html">
-<link rel="lazy-import" href="my-view3.html">
+<link rel="lazy-import" href="my-positions.html">
+<link rel="lazy-import" href="my-modules.html">
+<link rel="lazy-import" href="my-employees.html">
 <link rel="lazy-import" href="my-view404.html">
 
 <dom-module id="my-app">
-  <template>
-    <style>
-      :host {
-        --app-primary-color: #f46455;
-        --app-secondary-color: black;
+    <template>
+        <style>
+            :host {
+                --app-primary-color: #f46455;
+                --app-secondary-color: black;
 
-        display: block;
-      }
+                display: block;
+            }
 
-      app-drawer-layout:not([narrow]) [drawer-toggle] {
-        display: none;
-      }
+            app-drawer-layout:not([narrow]) [drawer-toggle] {
+                display: none;
+            }
 
-      app-toolbar a{
-        text-decoration: none;
-        color: white;
-      }
+            app-toolbar a {
+                text-decoration: none;
+                color: white;
+            }
 
-      app-header {
-        color: #fff;
-        background-color: var(--app-primary-color);
-      }
+            app-header {
+                color: #fff;
+                background-color: var(--app-primary-color);
+            }
 
-      app-header paper-icon-button {
-        --paper-icon-button-ink-color: white;
-      }
+            app-header paper-icon-button {
+                --paper-icon-button-ink-color: white;
+            }
 
-      .drawer-list {
-        margin: 0 20px;
-      }
+            .drawer-list {
+                margin: 0 20px;
+            }
 
-      .drawer-list a {
-        display: block;
-        padding: 0 16px;
-        text-decoration: none;
-        color: var(--app-secondary-color);
-        line-height: 40px;
-      }
+            .drawer-list a {
+                display: block;
+                padding: 0 16px;
+                text-decoration: none;
+                color: var(--app-secondary-color);
+                line-height: 40px;
+            }
 
-      .drawer-list a.iron-selected {
-        color: black;
-        font-weight: bold;
-      }
+            .drawer-list a.iron-selected {
+                color: black;
+                font-weight: bold;
+            }
 
-      .right-buttons{
-        margin-left: auto;
-      }
-    </style>
+            .right-buttons {
+                margin-left: auto;
+            }
+        </style>
 
-    <app-location
-        route="{{route}}"
-        url-space-regex="^[[rootPath]]">
-    </app-location>
 
-    <app-route
-        route="{{route}}"
-        pattern="[[rootPath]]:page"
-        data="{{routeData}}"
-        tail="{{subroute}}">
-    </app-route>
 
-    <app-drawer-layout fullbleed narrow="{{narrow}}">
 
-      <template is="dom-if" if="{{isAuthenticated}}" notifyDomChange="true">
-      <!-- Drawer content -->
-      <app-drawer id="drawer" slot="drawer" swipe-open="[[narrow]]">
-        <app-toolbar>Menu</app-toolbar>
-        <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
-          <a name="view1" href="[[rootPath]]view1">View One</a>
-          <a name="view2" href="[[rootPath]]view2">View Two</a>
-          <a name="view3" href="[[rootPath]]view3">View Three</a>
-        </iron-selector>
-      </app-drawer>
-      </template>
 
-      <!-- Main content -->
-      <app-header-layout has-scrolling-region>
 
-        <app-header slot="header" condenses reveals effects="waterfall">
-          <app-toolbar>
-            <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
-            <a href="[[rootPath]]home">
-            <div main-title>Caboose</div>
-            </a>
 
-            <template is="dom-if" if="{{!isAuthenticated}}">
-            <span class="right-buttons">
-              <paper-button on-click="openLoginDialog">Log In</paper-button>
-              <paper-button >Sign Up</paper-button>
-             </span>
+        <app-location
+                route="{{route}}"
+                url-space-regex="^[[rootPath]]">
+        </app-location>
+
+        <app-route
+                route="{{route}}"
+                pattern="[[rootPath]]:page"
+                data="{{routeData}}"
+                tail="{{subroute}}">
+        </app-route>
+
+        <app-drawer-layout fullbleed narrow="{{narrow}}">
+
+            <template is="dom-if" if="{{user}}" notifyDomChange="true">
+                <!-- Drawer content -->
+                <app-drawer id="drawer" slot="drawer" swipe-open="[[narrow]]">
+                    <app-toolbar>Menu</app-toolbar>
+                    <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
+                        <a name="organization" href="[[rootPath]]organization">Organization</a>
+                        <a name="positions" href="[[rootPath]]positions">Positions</a>
+                        <a name="modules" href="[[rootPath]]modules">Modules</a>
+                        <a name="employees" href="[[rootPath]]employees">Employees</a>
+                        <a name="settings" href="[[rootPath]]settings">Settings</a>
+
+                    </iron-selector>
+                </app-drawer>
             </template>
 
-            <template is="dom-if" if="{{isAuthenticated}}">
+            <!-- Main content -->
+            <app-header-layout has-scrolling-region>
+
+                <app-header slot="header" condenses reveals effects="waterfall">
+                    <app-toolbar>
+                        <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
+                        <a href="[[rootPath]]home">
+                            <div main-title>Caboose</div>
+                        </a>
+
+                        <template is="dom-if" if="{{!user}}">
+            <span class="right-buttons">
+              <paper-button on-click="openLoginDialog">Log In</paper-button>
+              <paper-button>Sign Up</paper-button>
+             </span>
+                        </template>
+
+                        <template is="dom-if" if="{{user}}">
             <span class="right-buttons">
               <paper-button on-click="openLoginDialog">Log Out</paper-button>
              </span>
-            </template>
+                        </template>
 
-          </app-toolbar>
-        </app-header>
+                    </app-toolbar>
+                </app-header>
 
-        <iron-pages
-            selected="[[page]]"
-            attr-for-selected="name"
-            fallback-selection="view404"
-            role="main">
-          <my-home name="home"></my-home>
-          <my-view1 name="view1"></my-view1>
-          <my-view2 name="view2"></my-view2>
-          <my-view3 name="view3"></my-view3>
-          <my-view404 name="view404"></my-view404>
-        </iron-pages>
-      </app-header-layout>
-    </app-drawer-layout>
+                <iron-pages
+                        selected="[[page]]"
+                        attr-for-selected="name"
+                        fallback-selection="view404"
+                        role="main">
+                    <my-home name="home"></my-home>
+                    <my-view404 name="view404"></my-view404>
 
-    <paper-dialog id="modal" modal>
-      <my-auth user="{{isAuthenticated}}" ></my-auth>
-      <div class="buttons">
-        <paper-button dialog-confirm autofocus>Close</paper-button>
-      </div>
-    </paper-dialog>
+                    <my-positions user="{{user}}" name="positions"></my-positions>
+                    <my-modules user="{{user}}" name="modules"></my-modules>
+                    <my-employees user="{{user}}" name="employees"></my-employees>
+                    <my-settings user="{{user}}" name="settings"></my-settings>
+                    <my-organization user="{{user}}" name="organization"></my-organization>
 
-  </template>
 
-  <script>
-    // Gesture events like tap and track generated from touch will not be
-    // preventable, allowing for better scrolling performance.
-    Polymer.setPassiveTouchGestures(true);
+                </iron-pages>
+            </app-header-layout>
+        </app-drawer-layout>
 
-    class MyApp extends Polymer.Element {
-      static get is() { return 'my-app'; }
+        <paper-dialog id="loginDialog" modal>
+            <my-auth user="{{user}}"></my-auth>
+            <div class="buttons">
+                <paper-button dialog-confirm autofocus>Close</paper-button>
+            </div>
+        </paper-dialog>
 
-      static get properties() {
-        return {
-          isAuthenticated: {
-             type: Boolean,
-             value: false,
-              observer: '_alertLogIn',
-          },
-          page: {
-            type: String,
-            reflectToAttribute: true,
-            observer: '_pageChanged',
-          },
-          routeData: Object,
-          subroute: Object,
-          // This shouldn't be neccessary, but the Analyzer isn't picking up
-          // Polymer.Element#rootPath
-          rootPath: String,
-        };
-      }
+    </template>
 
-      static get observers() {
-        return [
-          '_routePageChanged(routeData.page)',
-        ];
-      }
+    <script>
+        // Gesture events like tap and track generated from touch will not be
+        // preventable, allowing for better scrolling performance.
+        Polymer.setPassiveTouchGestures(true);
 
-      _routePageChanged(page) {
-        // If no page was found in the route data, page will be an empty string.
-        // Default to 'view1' in that case.
-        this.page = page || 'home';
+        class MyApp extends Polymer.Element {
+            static get is() {
+                return 'my-app';
+            }
 
-        // Close a non-persistent drawer when the page & route are changed.
-        if (!this.$.drawer.persistent) {
-          this.$.drawer.close();
+            static get properties() {
+                return {
+                    user: {
+                        type: Object,
+                        value: false
+                    },
+                    page: {
+                        type: String,
+                        reflectToAttribute: true,
+                        observer: '_pageChanged',
+                    },
+                    routeData: Object,
+                    subroute: Object,
+                    // This shouldn't be neccessary, but the Analyzer isn't picking up
+                    // Polymer.Element#rootPath
+                    rootPath: String,
+                };
+            }
+
+            static get observers() {
+                return [
+                    '_routePageChanged(routeData.page)',
+                ];
+            }
+
+            _routePageChanged(page) {
+                // If no page was found in the route data, page will be an empty string.
+                // Default to 'view1' in that case.
+                this.page = page || 'home';
+
+                // Close a non-persistent drawer when the page & route are changed.
+                if (!this.$.drawer.persistent) {
+                    this.$.drawer.close();
+                }
+            }
+
+
+            _pageChanged(page) {
+                // Load page import on demand. Show 404 page if fails
+                const resolvedPageUrl = this.resolveUrl('my-' + page + '.html');
+                Polymer.importHref(resolvedPageUrl,
+                    null,
+                    this._showPage404.bind(this),
+                    true);
+            }
+
+            openLoginDialog() {
+                this.$.loginDialog.open();
+            }
+
+            _showPage404() {
+                this.page = 'view404';
+            }
+
+
         }
-      }
 
-        _alertLogIn(isAuthenticated) {
-          if(!isAuthenticated) {
-             // alert('log out');
-          }
-        }
-
-      _pageChanged(page) {
-        // Load page import on demand. Show 404 page if fails
-        const resolvedPageUrl = this.resolveUrl('my-' + page + '.html');
-        Polymer.importHref(resolvedPageUrl,
-            null,
-            this._showPage404.bind(this),
-            true);
-      }
-
-        openLoginDialog() {
-            this.$.modal.open();
-        }
-
-      _showPage404() {
-        this.page = 'view404';
-      }
-    }
-
-    window.customElements.define(MyApp.is, MyApp);
-  </script>
+        window.customElements.define(MyApp.is, MyApp);
+    </script>
 </dom-module>

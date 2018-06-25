@@ -24,31 +24,35 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             }
 
-            .logo{
-                width: 25%;
-                height: 25%;
-            }
         </style>
 
         <div class="card">
 
             <h1>My Settings</h1>
 
-
-
-
-
             <template is="dom-if" if="[[user]]">
-                <p>[[user.displayName]]</p>
+
+                <paper-input always-float-label label="Display Name" value="{{settings.name}}"></paper-input>
+                <paper-input always-float-label label="Email" value="{{settings.email}}"></paper-input>
+
+
+                <firebase-document
+                        app-name="cabooseBE"
+                        path="/Customers/[[user.uid]]"
+                        data="{{settings}}">
+                </firebase-document>
+
+
+
+
+
             </template>
 
 
     </template>
 
     <template is="dom-if" if="[[!user]]">
-
         <p>Please Log In</p>
-
     </template>
 
 
@@ -63,17 +67,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             static get properties() {
                 return {
-                   user:{
-                       type: Object
-                   }
-                }
-            }
-
-            dataChanged(newData, oldData) {
-                console.log(`New Data`);
-                console.log(newData)
-                console.log(`Old data`);
-                console.log(oldData)
+                    user: {
+                        type: Object,
+                    },
+                    settings:{
+                        type: Object,
+                        value: function(){ return{};},
+                    },
+                 };
             }
         }
 

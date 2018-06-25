@@ -24,6 +24,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
 
 
 <link rel="import" href="my-icons.html">
@@ -85,12 +86,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             .right-buttons {
                 margin-left: auto;
             }
+
+
         </style>
-
-
-
-
-
 
 
         <app-location
@@ -113,10 +111,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <app-toolbar>Menu</app-toolbar>
                     <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
                         <a name="organization" href="[[rootPath]]organization">Organization</a>
-                        <a name="positions" href="[[rootPath]]positions">Positions</a>
-                        <a name="modules" href="[[rootPath]]modules">Modules</a>
-                        <a name="employees" href="[[rootPath]]employees">Employees</a>
                         <a name="settings" href="[[rootPath]]settings">Settings</a>
+                        <a name="modules" href="[[rootPath]]modules">Modules</a>
+                        <a name="positions" href="[[rootPath]]positions">Positions</a>
+                        <a name="employees" href="[[rootPath]]employees">Employees</a>
+
 
                     </iron-selector>
                 </app-drawer>
@@ -156,11 +155,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <my-home name="home"></my-home>
                     <my-view404 name="view404"></my-view404>
 
-                    <my-positions user="{{user}}" name="positions"></my-positions>
-                    <my-modules user="{{user}}" name="modules"></my-modules>
-                    <my-employees user="{{user}}" name="employees"></my-employees>
-                    <my-settings user="{{user}}" name="settings"></my-settings>
-                    <my-organization user="{{user}}" name="organization"></my-organization>
+                    <my-positions page="{{page}}" org-id="{{orgId}}" user="{{user}}" name="positions"></my-positions>
+
+                    <my-modules page="{{page}}" org-id="{{orgId}}" user="{{user}}" name="modules"></my-modules>
+
+                    <my-employees page="{{page}}" org-id="{{orgId}}" user="{{user}}" name="employees"></my-employees>
+
+                    <my-settings page="{{page}}" org-id="{{orgId}}" user="{{user}}" name="settings"></my-settings>
+
+                    <my-organization page="{{page}}" org-id="{{orgId}}" user="{{user}}" name="organization"></my-organization>
 
 
                 </iron-pages>
@@ -168,11 +171,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </app-drawer-layout>
 
         <paper-dialog id="loginDialog" modal>
-            <my-auth user="{{user}}"></my-auth>
+            <my-auth page="{{page}}" org-id="{{orgId}}" user="{{user}}"></my-auth>
             <div class="buttons">
                 <paper-button dialog-confirm autofocus>Close</paper-button>
             </div>
         </paper-dialog>
+
+
+        <firebase-document
+                app-name="cabooseBE"
+                path="/Customers/[[user.uid]]/CustomerOrgId"
+                data="{{orgId}}">
+        </firebase-document>
+
 
     </template>
 
@@ -190,7 +201,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 return {
                     user: {
                         type: Object,
-                        value: false
+                        value: false,
+                    },
+                    orgId: {
+                        type: String,
                     },
                     page: {
                         type: String,

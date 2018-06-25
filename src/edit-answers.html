@@ -1,0 +1,225 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="../bower_components/vaadin-grid/vaadin-grid-selection-column.html">
+
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="shared-styles.html">
+
+
+<dom-module id="edit-answers">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                padding: 10px;
+                height: 700px;
+                width: 1000px;
+
+                overflow: auto;
+            }
+
+            paper-fab {
+                margin-top: 10px;
+                margin-right: 10px;
+                margin-left: auto;
+            }
+        </style>
+
+        <div class="card">
+            <h1>Edit Answers - [[questionTitle]]</h1>
+            <firebase-document
+                    app-name="cabooseBE"
+                    id="answerSync">
+            </firebase-document>
+
+            <template is="dom-if" if="{{user}}">
+                <template is="dom-if" if="{{_isString(orgId)}}">
+
+                    <firebase-query
+                            id="query"
+                            app-name="cabooseBE"
+                            path="/Questions/[[orgId]]/[[moduleId]]/[[questionId]]/Answers"
+                            data="{{answerList}}">
+                    </firebase-query>
+
+                    <vaadin-grid id="answerGrid"  aria-label="Modules" items="[[answerList]]">
+
+                        <vaadin-grid-column width="60px" flex-grow="0" >
+                            <template class="header">#</template>
+                            <template>[[index]]</template>
+                            <template class="footer">#</template>
+                        </vaadin-grid-column>
+
+                        <vaadin-grid-column>
+                            <template class="header">Answer</template>
+                            <template>[[item.text]]</template>
+                            <template class="footer">Answer</template>
+                        </vaadin-grid-column>
+
+                        <vaadin-grid-column>
+                            <template>
+                                <paper-icon-button
+                                        title="Mark Answer"
+                                        icon$="{{_getStatus(item.marked)}}"
+                                        on-click="_markAnswer">
+                                </paper-icon-button>
+                                <paper-icon-button
+                                        title="Edit Answer"
+                                        icon="create"
+                                        on-click="_editAnswer">
+                                </paper-icon-button>
+                                <paper-icon-button
+                                        title="Delete Question"
+                                        icon="delete"
+                                        on-click="_deleteAnswer">
+                                </paper-icon-button>
+                            </template>
+                        </vaadin-grid-column>
+
+                    </vaadin-grid>
+
+
+                    <paper-input
+                            id="answerTitle"
+                            name="title"
+                            label="New Answer"
+                            value="{{answer.text}}"
+                            max="100">
+                    </paper-input>
+
+
+
+                    <paper-fab mini id="newAnswer"
+                               icon="add"
+                               on-tap="_addAnswer"
+                               disabled="[[!user]]"
+                               aria-label="Add Question">
+                    </paper-fab>
+                </template>
+            </template>
+
+
+        </div>
+    </template>
+
+    <script>
+        class EditAnswers extends Polymer.Element {
+            static get is() {
+                return 'edit-answers';
+            }
+
+            static get properties() {
+                return {
+                    answer: {
+                        type: Object,
+                        value: function() {
+                            return {};
+                        },
+                    },
+                    answerList: {
+                        type: Object,
+                    },
+                    user: {
+                        type: Object,
+                    },
+                    orgId: {
+                        type: String,
+                    },
+                    moduleId: {
+                        type: String,
+                    },
+                    questionId: {
+                        type: String,
+                    },
+                    questionTitle: {
+                        type: String,
+                    },
+                    selectedAnswer: {
+                        type: String,
+                    },
+                };
+            }
+
+
+
+            _getStatus(isMarked){
+                if(isMarked){
+                    return "star"
+                }else{
+                    return "star-border"
+                }
+            }
+
+            _markAnswer(e){
+                var status = e.path[2].getAttribute("icon");
+                if(status == "star-border"){
+                    var marked = true;
+                    e.path[2].setAttribute("icon","star");
+                }else{
+                    var marked = false;
+                    e.path[2].setAttribute("icon","star-border");
+                }
+
+                var text = e.model.item.text;
+                this.selectedAnswer = e.model.item.$key;
+
+                this.$.answerSync.path = null;
+                this.$.answerSync.data = {text:text, marked: marked};
+                this.$.answerSync.saveValue(`/Questions/${this.orgId}/${this.moduleId}/${this.questionId}/Answers`, this.selectedAnswer);
+                this.selectedAnswer = '';
+
+            }
+
+            _editAnswer(e) {
+                e.cancelBubble = true;
+                e.stopPropagation();
+                console.log(e)
+                this.selectedAnswer = e.model.item.$key;
+                this.shadowRoot.querySelector('#answerTitle').value = e.model.item.text;
+                this.shadowRoot.querySelector('#answerTitle').setAttribute("label", "Edit Question")
+                this.shadowRoot.querySelector('#newAnswer').setAttribute("icon","create");
+            }
+
+            _addAnswer(e) {
+                e.cancelBubble = true;
+                e.stopPropagation();
+                this.$.answerSync.path = null;
+                this.$.answerSync.data = this.answer;
+                this.$.answerSync.saveValue(`/Questions/${this.orgId}/${this.moduleId}/${this.questionId}/Answers`, this.selectedAnswer);
+                this.shadowRoot.querySelector('#answerTitle').value = '';
+                this.selectedAnswer = '';
+                this.shadowRoot.querySelector('#newAnswer').setAttribute("icon", "add");
+                this.shadowRoot.querySelector('#answerTitle').setAttribute("label", "New Question");
+            }
+
+        _selectItem(e){
+            e.cancelBubble = true;
+            e.stopPropagation();
+            console.log(e);
+        }
+             _deleteAnswer(e) {
+                 e.cancelBubble = true;
+                 e.stopPropagation();
+                this.$.answerSync.path = `/Questions/${this.orgId}/${this.moduleId}/${this.questionId}/Answers/${e.model.item.$key}`;
+                this.$.answerSync.destroy();
+            }
+
+
+
+
+
+
+            _isString(val) {
+                return (typeof val === 'string');
+            }
+        }
+
+        window.customElements.define(EditAnswers.is, EditAnswers);
+    </script>
+</dom-module>
+

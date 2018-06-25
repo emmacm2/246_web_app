@@ -19,24 +19,27 @@ Positions
     CustomerId
        PositionId
          Position Name : value
-         Modules:[moduleIds]
+         Modules
+          [moduleIds]:true
 
 Modules
     CustomerId
-        ModuleId: Module Name
-          Type: YoutubeURL / HTML
-          Data: value
-          Questions:[questionIds]
+        ModuleId:
+           Name
+           Type: YoutubeURL / HTML
+           Data: value
+             Questions:[questionIds]
 
 
 Questions
     CustomerId
+      ModuleId
         QuestionId
             QuestionText: value
             Answer: value
             Choices: [values]
 
-Users
+Employees
     CustomerId
             UserId
              Public

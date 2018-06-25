@@ -1,0 +1,160 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
+
+<dom-module id="module-list">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                padding: 10px;
+                height: 600px;
+                width: 1200px;
+                overflow-x: auto;
+            }
+
+            .workArea {
+                display: flex;
+                flex-direction: row;
+            }
+        </style>
+
+        <firebase-document
+                app-name="cabooseBE"
+                id="ModuleListSync">
+        </firebase-document>
+        <div class="card">
+            <h1>Module List</h1>
+            <template is="dom-if" if="{{user}}">
+                <template is="dom-if" if="{{_isString(orgId)}}">
+                    <firebase-query
+                            id="query"
+                            app-name="cabooseBE"
+                            path="/Positions/[[orgId]]/[[positionId]]/modules"
+                            data="{{selectedModuleList}}">
+                    </firebase-query>
+
+                    <firebase-query
+                            id="query2"
+                            app-name="cabooseBE"
+                            path="/Modules/[[orgId]]"
+                            data="{{allModuleList}}">
+                    </firebase-query>
+
+
+                    <div class="workArea">
+                        <vaadin-grid aria-label="Positions" items="[[allModuleList]]">
+                            <vaadin-grid-column>
+                                <template class="header">Available Modules</template>
+                                <template>[[item.name]]</template>
+                                <template class="footer">Available Modules</template>
+                            </vaadin-grid-column>
+                            <vaadin-grid-column>
+                                <template>
+                                    <paper-icon-button
+                                            title="Add Module"
+                                            icon="add"
+                                            on-tap="_addModule">
+                                    </paper-icon-button>
+                                </template>
+                            </vaadin-grid-column>
+                        </vaadin-grid>
+
+                        <vaadin-grid aria-label="Positions" items="[[selectedModuleList]]">
+                            <vaadin-grid-column>
+                                <template class="header">Selected Modules</template>
+                                <template>[[_getModuleName(item.id)]]</template>
+                                <template class="footer">Selected Modules</template>
+                            </vaadin-grid-column>
+                            <vaadin-grid-column>
+                                <template>
+                                    <paper-icon-button
+                                            title="Remove Module"
+                                            icon="remove"
+                                            on-tap="_removeModule">
+                                    </paper-icon-button>
+                                </template>
+                            </vaadin-grid-column>
+                        </vaadin-grid>
+                    </div>
+
+                </template>
+            </template>
+        </div>
+    </template>
+
+    <script>
+        class ModuleList extends Polymer.Element {
+            static get is() {
+                return 'module-list';
+            }
+
+            static get properties() {
+                return {
+                    user: {
+                        type: Object,
+                    },
+                    orgId: {
+                        type: String,
+                    },
+                    positionId: {
+                        type: String,
+                    },
+                    selectedModule: {
+                        type: Object,
+                        value: function() {
+                            return {};
+                        },
+            },
+                allModuleList: {
+                    type: Object,
+                }
+            ,
+                selectedModuleList: {
+                    type: Object,
+                }
+            ,
+            }
+                ;
+            }
+
+            _removeModule(e) {
+                e.cancelBubble = true;
+                e.stopPropagation();
+                this.$.ModuleListSync.path = `/Positions/${this.orgId}/${this.positionId}/modules/${e.model.item.$key}`;
+                this.$.ModuleListSync.destroy();
+
+            }
+
+            _getModuleName(moduleId) {
+                for (let i = 0; i < this.allModuleList.length; i++) {
+                    if (this.allModuleList[i].$key === moduleId) {
+                        return this.allModuleList[i].name;
+                    }
+                }
+                return 'Not Found';
+            }
+
+            _addModule(e) {
+                this.selectedModule.id = e.model.item.$key;
+                this.selectedModule.index = e.model.index;
+                console.log( this.selectedModule);
+                e.cancelBubble = true;
+                e.stopPropagation();
+
+                this.$.ModuleListSync.path = null;
+                this.$.ModuleListSync.data = this.selectedModule;
+                this.$.ModuleListSync.saveValue(`/Positions/${this.orgId}/${this.positionId}/modules`);
+            }
+
+            _isString(val) {
+                return (typeof val === 'string');
+            }
+        }
+
+
+        window.customElements.define(ModuleList.is, ModuleList);
+    </script>
+</dom-module>

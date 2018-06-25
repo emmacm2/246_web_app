@@ -1,0 +1,159 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
+
+<dom-module id="positions-list">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                padding: 10px;
+                height: 600px;
+                width: 1200px;
+                overflow-x: auto;
+            }
+
+            .workArea {
+                display: flex;
+                flex-direction: row;
+            }
+        </style>
+
+        <firebase-document
+                app-name="cabooseBE"
+                id="PositionsListSync">
+        </firebase-document>
+
+        <div class="card">
+            <h1>Module List</h1>
+            <template is="dom-if" if="{{user}}">
+                <template is="dom-if" if="{{_isString(orgId)}}">
+                    <firebase-query
+                            id="query"
+                            app-name="cabooseBE"
+                            path="/Employees/[[orgId]]/[[employeeId]]/positions"
+                            data="{{selectedPositionsList}}">
+                    </firebase-query>
+
+                    <firebase-query
+                            id="query2"
+                            app-name="cabooseBE"
+                            path="/Positions/[[orgId]]"
+                            data="{{allPositionsList}}">
+                    </firebase-query>
+
+
+                    <div class="workArea">
+                        <vaadin-grid aria-label="Positions" items="[[allPositionsList]]">
+                            <vaadin-grid-column>
+                                <template class="header">Available Positions</template>
+                                <template>[[item.name]]</template>
+                                <template class="footer">Available Positions</template>
+                            </vaadin-grid-column>
+                            <vaadin-grid-column>
+                                <template>
+                                    <paper-icon-button
+                                            title="Add Position"
+                                            icon="add"
+                                            on-tap="_addPosition">
+                                    </paper-icon-button>
+                                </template>
+                            </vaadin-grid-column>
+                        </vaadin-grid>
+
+                        <vaadin-grid aria-label="Positions" items="[[selectedPositionsList]]">
+                            <vaadin-grid-column>
+                                <template class="header">Selected Positions</template>
+                                <template>[[_getPositionName(item.id)]]</template>
+                                <template class="footer">Selected Positions</template>
+                            </vaadin-grid-column>
+                            <vaadin-grid-column>
+                                <template>
+                                    <paper-icon-button
+                                            title="Remove Position"
+                                            icon="remove"
+                                            on-tap="_removePosition">
+                                    </paper-icon-button>
+                                </template>
+                            </vaadin-grid-column>
+                        </vaadin-grid>
+                    </div>
+
+                </template>
+            </template>
+        </div>
+    </template>
+
+    <script>
+        class PositionsList extends Polymer.Element {
+            static get is() {
+                return 'positions-list';
+            }
+
+            static get properties() {
+                return {
+                    user: {
+                        type: Object,
+                    },
+                    orgId: {
+                        type: String,
+                    },
+                    employeeId: {
+                        type: String,
+                    },
+                    selectedPosition: {
+                        type: Object,
+                        value: function() {
+                            return {};
+                        },
+            },
+                allPositionsList: {
+                    type: Object,
+                },
+                    selectedPositionsList: {
+                    type: Object,
+                }
+            ,
+            }
+                ;
+            }
+
+            _removePosition(e) {
+                e.cancelBubble = true;
+                e.stopPropagation();
+                this.$.PositionsListSync.path = `/Employees/${this.orgId}/${this.employeeId}/positions/${e.model.item.$key}`;
+                this.$.PositionsListSync.destroy();
+            }
+
+            _getPositionName(moduleId) {
+                for (let i = 0; i < this.allPositionsList.length; i++) {
+                    if (this.allPositionsList[i].$key === moduleId) {
+                        return this.allPositionsList[i].name;
+                    }
+                }
+                return 'Not Found';
+            }
+
+            _addPosition(e) {
+                this.selectedPosition.id = e.model.item.$key;
+                this.selectedPosition.index = e.model.index;
+                this.selectedPosition.assignedDate = new Date().toISOString();
+                e.cancelBubble = true;
+                e.stopPropagation();
+
+                this.$.PositionsListSync.path = null;
+                this.$.PositionsListSync.data = this.selectedPosition;
+                this.$.PositionsListSync.saveValue(`/Employees/${this.orgId}/${this.employeeId}/positions`);
+            }
+
+            _isString(val) {
+                return (typeof val === 'string');
+            }
+        }
+
+
+        window.customElements.define(PositionsList.is, PositionsList);
+    </script>
+</dom-module>

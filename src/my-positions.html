@@ -9,41 +9,184 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="shared-styles.html">
-
+<link rel="import" href="./module-list.html">
 
 
 <dom-module id="my-positions">
-  <template>
-    <style include="shared-styles">
-      :host {
-        display: block;
-
-        padding: 10px;
-      }
-    </style>
-
-    <div class="card">
-      <h1>Positions</h1>
-    </div>
-  </template>
-
-  <script>
-    class MyPositions extends Polymer.Element {
-        static get is() {
-            return 'my-positions';
-        }
-
-        static get properties() {
-            return {
-                isAuthenticated: {
-                    type: Boolean
-                }
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                padding: 10px;
             }
-        }
-    }
 
-    window.customElements.define(MyPositions.is, MyPositions);
-  </script>
+            paper-fab {
+                margin-top: 10px;
+                margin-right: 10px;
+                margin-left: auto;
+            }
+        </style>
+        <firebase-document
+                app-name="cabooseBE"
+                id="PositionSync">
+        </firebase-document>
+
+
+        <div class="card">
+            <h1>Positions</h1>
+            <template is="dom-if" if="{{user}}">
+                <template is="dom-if" if="{{_isString(orgId)}}">
+                    <firebase-query
+                            id="query"
+                            app-name="cabooseBE"
+                            path="/Positions/[[orgId]]"
+                            data="{{positionList}}">
+                    </firebase-query>
+
+                    <vaadin-grid aria-label="Positions" items="[[positionList]]">
+
+                        <vaadin-grid-column width="60px" flex-grow="0">
+                            <template class="header">#</template>
+                            <template>[[index]]</template>
+                            <template class="footer">#</template>
+                        </vaadin-grid-column>
+                        <vaadin-grid-column>
+                            <template class="header">Position Name</template>
+                            <template>[[item.name]]</template>
+                            <template class="footer">Position Name</template>
+                        </vaadin-grid-column>
+                        <vaadin-grid-column>
+                            <template>
+                                <paper-icon-button
+                                        title="Edit Modules"
+                                        icon="description"
+                                        on-click="_editModules">
+                                </paper-icon-button>
+                                <paper-icon-button
+                                        title="Edit Position"
+                                        icon="create"
+                                        on-click="_editPosition">
+                                </paper-icon-button>
+                                <paper-icon-button
+                                        title="Delete Position"
+                                        icon="delete"
+                                        on-click="_deletePosition">
+                                </paper-icon-button>
+                            </template>
+                        </vaadin-grid-column>
+                    </vaadin-grid>
+                    <paper-input
+                            id="positionTitle"
+                            name="title"
+                            label="New Position"
+                            value="{{position.name}}"
+                            max="100">
+                    </paper-input>
+                    <paper-fab mini id="newPosition"
+                               icon="add"
+                               on-tap="_createPosition"
+                               disabled="[[!user]]"
+                               aria-label="Add Position">
+                    </paper-fab>
+                </template>
+            </template>
+        </div>
+
+        <paper-dialog id="modulePicker">
+            <module-list
+                    id="moduleList"
+                    user="{{user}}"
+                    org-id="{{orgId}}"
+                    position-id="{{selectedPosition}}">
+            </module-list>
+            <div class="buttons">
+                <paper-button raised dialog-confirm autofocus>Close</paper-button>
+            </div>
+        </paper-dialog>
+
+
+    </template>
+
+    <script>
+        class MyPositions extends Polymer.Element {
+            static get is() {
+                return 'my-positions';
+            }
+
+            static get properties() {
+                return {
+                    positionList: {
+                        type: Object,
+                    },
+                    user: {
+                        type: Object,
+                    },
+                    orgId: {
+                        type: String,
+                    },
+                    position: {
+                        type: Object,
+                        value: function () {
+                            return {}
+                        },
+                    },
+                    selectedPosition: {
+                        type: String,
+                    },
+                };
+            }
+
+            _isString(val) {
+                return (typeof val === 'string');
+            }
+
+            _createPosition(e) {
+                e.cancelBubble = true;
+                e.stopPropagation();
+                this.$.PositionSync.path = null;
+                this.$.PositionSync.data = this.position;
+                this.$.PositionSync.saveValue(`/Positions/${this.orgId}/`, this.selectedPosition);
+                this.shadowRoot.querySelector('#positionTitle').value = '';
+                this.selectedPosition = '';
+                this.shadowRoot.querySelector('#newPosition').setAttribute("icon", "add");
+                this.shadowRoot.querySelector('#positionTitle').setAttribute("label", "New Position")
+            }
+
+            _editPosition(e) {
+                console.log(e.model.item);
+                e.cancelBubble = true;
+                e.stopPropagation();
+                this.selectedPosition = e.model.item.$key;
+                this.shadowRoot.querySelector('#positionTitle').value = e.model.item.name;
+                this.shadowRoot.querySelector('#positionTitle').setAttribute("label", "Edit Position")
+                this.shadowRoot.querySelector('#newPosition').setAttribute("icon", "create");
+            }
+
+
+            _editModules(e) {
+                this.selectedPosition = e.model.item.$key;
+                this.$.modulePicker.open();
+            }
+
+            _deletePosition(e) {
+                e.cancelBubble = true;
+                e.stopPropagation();
+                this.$.PositionSync.path = `/Positions/${this.orgId}/${e.model.item.$key}`;
+                this.$.PositionSync.destroy();
+            }
+
+        }
+
+        window.customElements.define(MyPositions.is, MyPositions);
+    </script>
 </dom-module>
 

@@ -1,0 +1,83 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymer-quill/polymer-quill.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="rich-edit">
+    <template>
+        <style include="quill-core quill-snow">
+
+        </style>
+
+        <div id="editor"></div>
+
+    </template>
+    <script>
+        class RichEdit extends Polymer.Element {
+            constructor() {
+                super();
+                this.editor = {};
+            }
+
+            static get is() {
+                return 'rich-edit';
+            }
+
+            ready() {
+                super.ready();
+
+
+                var toolbarOptions = [
+                    ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+                    ['blockquote'],
+
+                    [{'header': 1}, {'header': 2}],               // custom button values
+                    [{'list': 'ordered'}, {'list': 'bullet'}],
+                    [{'script': 'sub'}, {'script': 'super'}],      // superscript/subscript
+                    [{'indent': '-1'}, {'indent': '+1'}],          // outdent/indent
+                    [{'direction': 'rtl'}],                         // text direction
+
+                    [{'size': ['small', false, 'large', 'huge']}],  // custom dropdown
+                    [{'header': [1, 2, 3, 4, 5, 6, false]}],
+
+                    [{'color': []}, {'background': []}],          // dropdown with defaults from theme
+                    [{'font': []}],
+                    [{'align': []}],
+
+                    ['clean'],                                         // remove formatting button
+                ];
+                this.editor = new Quill(this.$.editor, {
+                    modules: {
+                        toolbar: toolbarOptions,
+                    },
+                    theme: 'snow',
+                });
+                Quill.prototype.getHtml = function() {
+                    return this.container.querySelector('.ql-editor').innerHTML;
+                };
+            }
+
+            static get properties() {
+                return {
+                    html: {
+                        type: String,
+                        observer(newData, oldData) {
+                            this.editor.clipboard.dangerouslyPasteHTML(0, newData);
+                        },
+                    },
+                };
+    }
+
+            getHtml() {
+                return this.editor.getHtml();
+            }
+
+            reset(){
+                this.html = '';
+                this.editor.setText('');
+            }
+        }
+
+
+        window.customElements.define(RichEdit.is, RichEdit);
+    </script>
+</dom-module>

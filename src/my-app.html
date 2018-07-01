@@ -29,6 +29,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="my-icons.html">
 <link rel="import" href="my-auth.html">
+<link rel="import" href="sign-up.html">
 
 <link rel="lazy-import" href="my-organization.html">
 <link rel="lazy-import" href="my-settings.html">
@@ -37,6 +38,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="lazy-import" href="my-modules.html">
 <link rel="lazy-import" href="my-employees.html">
 <link rel="lazy-import" href="my-view404.html">
+
 
 <dom-module id="my-app">
     <template>
@@ -134,7 +136,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <template is="dom-if" if="{{!user}}">
             <span class="right-buttons">
               <paper-button on-click="openLoginDialog">Log In</paper-button>
-              <paper-button>Sign Up</paper-button>
+              <paper-button on-click="openSignUpDialog">Sign Up</paper-button>
              </span>
                         </template>
 
@@ -172,6 +174,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <paper-dialog id="loginDialog" modal>
             <my-auth page="{{page}}" org-id="{{orgId}}" user="{{user}}"></my-auth>
+            <div class="buttons">
+                <paper-button dialog-confirm autofocus>Close</paper-button>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog id="SignUpDialog" modal>
+            <sign-up page="{{page}}" user="{{user}}"></sign-up>
             <div class="buttons">
                 <paper-button dialog-confirm autofocus>Close</paper-button>
             </div>
@@ -249,6 +258,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             openLoginDialog() {
                 this.$.loginDialog.open();
             }
+
+          openSignUpDialog(){
+            this.$.SignUpDialog.open();
+          }
 
             _showPage404() {
                 this.page = 'view404';

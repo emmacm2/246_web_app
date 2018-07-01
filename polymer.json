@@ -9,7 +9,8 @@
     "src/my-modules.html",
     "src/my-employees.html",
     "src/my-view404.html",
-    "src/my-organization.html"
+    "src/my-organization.html",
+    "src/sign-up.html"
   ],
   "sources": [
     "images/**/*",

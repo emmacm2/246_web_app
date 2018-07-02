@@ -135,8 +135,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     },
                     position: {
                         type: Object,
-                        value: function () {
-                            return {}
+                        value: function() {
+                            return {};
                         },
                     },
                     selectedPosition: {
@@ -157,8 +157,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.$.PositionSync.saveValue(`/Positions/${this.orgId}/`, this.selectedPosition);
                 this.shadowRoot.querySelector('#positionTitle').value = '';
                 this.selectedPosition = '';
-                this.shadowRoot.querySelector('#newPosition').setAttribute("icon", "add");
-                this.shadowRoot.querySelector('#positionTitle').setAttribute("label", "New Position")
+                this.shadowRoot.querySelector('#newPosition').setAttribute('icon', 'add');
+                this.shadowRoot.querySelector('#positionTitle').setAttribute('label', 'New Position');
             }
 
             _editPosition(e) {
@@ -167,8 +167,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 e.stopPropagation();
                 this.selectedPosition = e.model.item.$key;
                 this.shadowRoot.querySelector('#positionTitle').value = e.model.item.name;
-                this.shadowRoot.querySelector('#positionTitle').setAttribute("label", "Edit Position")
-                this.shadowRoot.querySelector('#newPosition').setAttribute("icon", "create");
+                this.shadowRoot.querySelector('#positionTitle').setAttribute('label', 'Edit Position');
+                this.shadowRoot.querySelector('#newPosition').setAttribute('icon', 'create');
             }
 
 

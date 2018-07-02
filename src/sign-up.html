@@ -11,147 +11,158 @@
 
 
 <dom-module id="sign-up">
-  <template>
+    <template>
 
-    <style include="shared-styles">
-      :host {
-        display: block;
-        padding: 10px;
-        width: 800px;
-      }
-    </style>
-    <firebase-auth id="signUp" app-name="cabooseBE" user="{{user}}"></firebase-auth>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                padding: 10px;
+                width: 800px;
+            }
+        </style>
+        <firebase-auth id="signUp" app-name="cabooseBE" user="{{user}}"></firebase-auth>
 
-    <div class="card">
-      <h1>Sign Up</h1>
-      <form id="form" is="iron-form">
+        <div class="card">
+            <h1>Sign Up</h1>
+            <form id="form" is="iron-form">
 
-        <password-validator
-            error-message="{{passwordErrorMessage}}">
-        </password-validator>
+                <password-validator
+                        error-message="{{passwordErrorMessage}}">
+                </password-validator>
 
-        <equality-validator
-            validator-name="repeat_password_validator"
-            check-equal-to="{{newUser.password}}">
-        </equality-validator>
+                <equality-validator
+                        validator-name="repeat_password_validator"
+                        check-equal-to="{{newUser.password}}">
+                </equality-validator>
 
-        <equality-validator
-            validator-name="repeat_email_validator"
-            check-equal-to="{{newUser.email}}">
-        </equality-validator>
+                <equality-validator
+                        validator-name="repeat_email_validator"
+                        check-equal-to="{{newUser.email}}">
+                </equality-validator>
 
 
-        <paper-input
-            id="displayName"
-            error-message="Display name required"
-            always-float-label
-            label="Display Name"
-            value="{{newUser.name}}"
-            required></paper-input>
+                <paper-input
+                        id="displayName"
+                        error-message="Display name required"
+                        always-float-label
+                        label="Display Name"
+                        value="{{newUser.name}}"
+                        required></paper-input>
 
-        <paper-input id="email"
-                     type="email"
-                     always-float-label
-                     label="Email"
-                     value="{{newUser.email}}"
-                     error-message="Please enter a valid email address"
-                     required>
-        </paper-input>
+                <paper-input
+                        id="companyName"
+                        error-message="Company name required"
+                        always-float-label
+                        label="Company Name"
+                        value="{{newUser.companyName}}"
+                        required>
+                </paper-input>
 
-        <paper-input id="emailCheck"
-                     type="text"
-                     always-float-label
-                     label="Retype Email"
-                     validator="repeat_email_validator"
-                     error-message="Email addresses do not match"
-                     required>
-        </paper-input>
+                <paper-input id="email"
+                             type="email"
+                             always-float-label
+                             label="Email"
+                             value="{{newUser.email}}"
+                             error-message="Please enter a valid email address"
+                             required>
+                </paper-input>
 
-        <gold-phone-input
-            id="phone"
-            error-message="Invalid US phone number"
-            value="{{newUser.phone}}"></gold-phone-input>
+                <paper-input id="emailCheck"
+                             type="text"
+                             always-float-label
+                             label="Retype Email"
+                             validator="repeat_email_validator"
+                             error-message="Email addresses do not match"
+                             required>
+                </paper-input>
 
-        <paper-input
-            id="password"
-            validator="password-validator"
-            type="password"
-            error-message="[[passwordErrorMessage]]"
-            label="Your password"
-            value="{{newUser.password}}">
-        </paper-input>
+                <gold-phone-input
+                        id="phone"
+                        error-message="Invalid US phone number"
+                        value="{{newUser.phone}}"></gold-phone-input>
 
-        <paper-input
-            id="checkPassword"
-            type="password"
-            validator="repeat_password_validator"
-            label="Repeat password"
-            error-message="Passwords do not match"
-            required>
-        </paper-input>
+                <paper-input
+                        id="password"
+                        validator="password-validator"
+                        type="password"
+                        error-message="[[passwordErrorMessage]]"
+                        label="Your password"
+                        value="{{newUser.password}}">
+                </paper-input>
 
-        <paper-button on-click="_validate" raised>
-          Submit
-        </paper-button>
-        <div>valid: [[isValid]]</div>
+                <paper-input
+                        id="checkPassword"
+                        type="password"
+                        validator="repeat_password_validator"
+                        label="Repeat password"
+                        error-message="Passwords do not match"
+                        required>
+                </paper-input>
 
-      </form>
-    </div>
+                <paper-button on-click="_validate" raised>
+                    Submit
+                </paper-button>
 
-  </template>
+            </form>
+        </div>
 
-  <script>
-    class SignUp extends Polymer.Element {
-      static get is() {
-        return 'sign-up';
-      }
+    </template>
 
-      static get properties() {
-        return {
-          page: {
-            type: String,
-          },
-          user:{
-            type: Object,
-          },
-          newUser: {
-            type: Object,
-            value: function() {
-              return {};
-            },
-          },
-        };
-      }
+    <script>
+        class SignUp extends Polymer.Element {
+            static get is() {
+                return 'sign-up';
+            }
 
-      _onSubmit() {
-        this.$.form.validate();
-      }
+            static get properties() {
+                return {
+                    page: {
+                        type: String,
+                    },
+                    user: {
+                        type: Object,
+                    },
+                    newUser: {
+                        type: Object,
+                        value: function() {
+                            return {};
+                        },
+                    },
+                };
+            }
 
-      _validate() {
-        this.isValid = this.$.emailCheck.validate();
-        this.isValid = this.$.email.validate();
-        this.isValid = this.$.password.validate();
-        this.isValid = this.$.checkPassword.validate();
-        this.isValid = this.$.phone.validate();
-        this.isValid = this.$.displayName.validate();
+            _onSubmit() {
+                this.$.form.validate();
+            }
 
-        if (this.isValid) {
-          this._createAccount();
-        }
-      }
+            _validate() {
+                this.isValid = this.$.emailCheck.validate();
+                this.isValid = this.$.email.validate();
+                this.isValid = this.$.password.validate();
+                this.isValid = this.$.checkPassword.validate();
+                this.isValid = this.$.phone.validate();
+                this.isValid = this.$.displayName.validate();
 
-      _createAccount() {
-        this.$.signUp.createUserWithEmailAndPassword(this.newUser.email, this.newUser.password).catch(function(error) {
-          console.log('BROKE')
+                if (this.isValid) {
+                    this._createAccount();
+                }
+            }
 
-        });
+            _createAccount() {
+        this.$.signUp.createUserWithEmailAndPassword(this.newUser.email, this.newUser.password)
+                    .then(function() {
 
-      }
 
+                    })
+                    .catch(function(error) {
+                        console.log('BROKE');
+                    });
     }
 
-    window.customElements.define(SignUp.is, SignUp);
-  </script>
+        }
+
+        window.customElements.define(SignUp.is, SignUp);
+    </script>
 
 
 </dom-module>

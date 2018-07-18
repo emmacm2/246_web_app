@@ -9,13 +9,13 @@
 <dom-module id="edit-module">
     <template>
         <firebase-document
-                app-name="cabooseBE"
+
                 id="moduleSave">
         </firebase-document>
 
         <template is="dom-if" if="{{moduleId}}">
             <firebase-document
-                    app-name="cabooseBE"
+
                     id="moduleUpdate"
                     path="/Modules/[[orgId]]/[[moduleId]]"
                     data="{{module}}">

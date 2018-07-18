@@ -36,7 +36,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         </style>
         <firebase-document
-                app-name="cabooseBE"
                 id="PositionSync">
         </firebase-document>
 
@@ -47,7 +46,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <template is="dom-if" if="{{_isString(orgId)}}">
                     <firebase-query
                             id="query"
-                            app-name="cabooseBE"
                             path="/Positions/[[orgId]]"
                             data="{{positionList}}">
                     </firebase-query>

@@ -35,7 +35,6 @@
         <div class="card">
             <h1>Questions</h1>
             <firebase-document
-                    app-name="cabooseBE"
                     id="questionSync">
             </firebase-document>
 
@@ -45,7 +44,6 @@
 
                     <firebase-query
                             id="query"
-                            app-name="cabooseBE"
                             path="/Questions/[[orgId]]/[[moduleId]]"
                             data="{{questionList}}">
                     </firebase-query>

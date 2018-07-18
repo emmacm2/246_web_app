@@ -22,24 +22,24 @@
         </style>
 
         <firebase-document
-                app-name="cabooseBE"
+
                 id="PositionsListSync">
         </firebase-document>
 
         <div class="card">
-            <h1>Module List</h1>
+            <h1>Assigned Positions</h1>
             <template is="dom-if" if="{{user}}">
                 <template is="dom-if" if="{{_isString(orgId)}}">
                     <firebase-query
                             id="query"
-                            app-name="cabooseBE"
+
                             path="/Employees/[[orgId]]/[[employeeId]]/positions"
                             data="{{selectedPositionsList}}">
                     </firebase-query>
 
                     <firebase-query
                             id="query2"
-                            app-name="cabooseBE"
+
                             path="/Positions/[[orgId]]"
                             data="{{allPositionsList}}">
                     </firebase-query>

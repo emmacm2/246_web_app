@@ -19,6 +19,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="shared-styles.html">
 <link rel="import" href="./positions-list.html">
+<link rel="import" href="./view-results.html">
 
 <dom-module id="my-employees">
     <template>
@@ -39,7 +40,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             <h1>Employees</h1>
             <firebase-document
-                    app-name="cabooseBE"
+
                     id="EmployeeSync">
             </firebase-document>
 
@@ -47,17 +48,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <template is="dom-if" if="{{_isString(orgId)}}">
                     <firebase-query
                             id="query"
-                            app-name="cabooseBE"
+
                             path="/Employees/[[orgId]]"
                             data="{{employeeList}}">
                     </firebase-query>
 
                     <vaadin-grid aria-label="Employees" items="[[employeeList]]">
-
                         <vaadin-grid-column>
-                            <template class="header">Id</template>
-                            <template>[[item.$key]]</template>
-                            <template class="footer">Id</template>
+                            <template class="header">Invite Code</template>
+                            <template>[[item.shortCode]]</template>
+                            <template class="footer">Invite Code</template>
                         </vaadin-grid-column>
                         <vaadin-grid-column>
                             <template class="header">Name</template>
@@ -136,6 +136,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </div>
         </paper-dialog>
 
+        <paper-dialog id="viewResults">
+            <view-results
+                id="viewResultsDialog"
+                user="{{user}}"
+                org-id="{{orgId}}"
+                employee-id="{{selectedEmployee}}">
+            </view-results>
+            <div class="buttons">
+                <paper-button raised dialog-confirm autofocus>Close</paper-button>
+            </div>
+        </paper-dialog>
+
     </template>
 
     <script>
@@ -169,12 +181,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _createEmployee(e) {
+              var _this = this;
                 e.cancelBubble = true;
                 e.stopPropagation();
 
                 this.$.EmployeeSync.path = null;
+                  this.employee.shortCode =  this._randomString(6);
                 this.$.EmployeeSync.data = this.employee;
-                this.$.EmployeeSync.saveValue(`/Employees/${this.orgId}/`, this.selectedEmployee);
+                this.$.EmployeeSync.saveValue(`/Employees/${this.orgId}/`, this.selectedEmployee).then(function(response){
+                  var userId = _this.$.EmployeeSync.path.split('/').pop();
+                  _this.$.EmployeeSync.path = null;
+                  _this.$.EmployeeSync.data = {
+                    orgId:_this.orgId,
+                    userId:userId
+                  }
+                  _this.$.EmployeeSync.saveValue(`/EmployeeLogins/`, _this.employee.shortCode);
+
+                });
+
                 this.shadowRoot.querySelector('#newEmployeeName').value = '';
                 this.shadowRoot.querySelector('#newEmployeeEmail').value = '';
                 this.selectedEmployee = '';
@@ -207,10 +231,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.$.positionPicker.open();
             }
 
+          _viewProgress(e){
+            this.selectedEmployee = e.model.item.$key;
+            this.$.viewResults.open();
+          }
+
 
             _isString(val) {
                 return (typeof val === 'string');
             }
+
+          _randomString(length) {
+            var text = "";
+            var possible = "ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijklmnpqrstuvwxyz0123456789";
+            for(var i = 0; i < length; i++) {
+              text += possible.charAt(Math.floor(Math.random() * possible.length));
+            }
+            return text;
+          }
         }
 
         window.customElements.define(MyEmployees.is, MyEmployees);

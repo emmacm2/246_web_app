@@ -1,0 +1,170 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="./module-list.html">
+
+<dom-module id="view-results">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+        height: 600px;
+        width: 1200px;
+      }
+
+      .workArea {
+        display: flex;
+        flex-direction: row;
+      }
+    </style>
+
+  <firebase-query
+
+        path="/Positions/[[orgId]]"
+        data="{{allPositionsList}}">
+    </firebase-query>
+
+    <firebase-query
+
+        path="/Modules/[[orgId]]"
+        data="{{allModulesList}}">
+    </firebase-query>
+
+    <firebase-query
+
+        path="/Questions/[[orgId]]"
+        data="{{allQuestionsList}}">
+    </firebase-query>
+
+
+    <firebase-query
+        id="query"
+
+        path="/EmployeeResponses/[[orgId]]/[[employeeId]]"
+        data="{{responseList}}">
+    </firebase-query>
+
+    <firebase-query
+        id="modQuery"
+
+        path=""
+        data="{{moduleList}}">
+    </firebase-query>
+
+
+    <div class="card">
+      <h1>View Progress</h1>
+
+      <div class="workArea">
+        <vaadin-grid aria-label="Positions" items="[[responseList]]">
+          <vaadin-grid-column width="100px" flex-grow="0">
+            <template class="header">Position Name</template>
+            <template>[[_getPositionName(item.$key)]]</template>
+            <template class="footer">Position Name</template>
+          </vaadin-grid-column>
+          <vaadin-grid-column>
+            <template>
+              <paper-icon-button
+                  title="Add Position"
+                  icon="visibility"
+                  on-tap="_selectPosition">
+              </paper-icon-button>
+            </template>
+          </vaadin-grid-column>
+
+        </vaadin-grid>
+        <vaadin-grid id="modList" aria-label="Modules" items="{{moduleList}}">
+          <vaadin-grid-column width="100px" flex-grow="0">
+            <template class="header">Position Name</template>
+            <template>[[item.$key]]</template>
+            <template class="footer">Position Name</template>
+          </vaadin-grid-column>
+        </vaadin-grid>
+      </div>
+
+    </div>
+  </template>
+
+
+  <script>
+    class ViewResults extends Polymer.Element {
+
+      static get is() {
+        return 'view-results';
+      }
+
+      static get properties() {
+        return {
+          allPositionsList: {
+            type: Object,
+          },
+          allModulesList:   {
+            type: Object,
+          },
+          allQuestionsList: {
+            type: Object,
+          },
+          responseList:     {
+            type:     Object,
+          },
+          moduleList:       {
+            type:  Object,
+          },
+          questionList:     {
+            type: Object,
+          },
+          employeeId:       {
+            type: String,
+          },
+          user:             {
+            type: Object,
+          },
+          orgId:            {
+            type: String,
+          },
+          selectedPosition: {},
+        };
+      }
+
+
+      _view(obj) {
+        return JSON.stringify(obj);
+      }
+
+      _isString(val) {
+        return (typeof val === 'string');
+      }
+
+      _getPositionName(positionId) {
+        for (let i = 0; i < this.allPositionsList.length; i++) {
+          if (this.allPositionsList[i].$key === positionId) {
+            return this.allPositionsList[i].name;
+          }
+        }
+        return 'Not Found';
+      }
+      _selectPosition(e){
+        var posKey = e.model.item.$key;
+        this.moduleList = this.responseList[posKey];
+
+
+
+      }
+
+    }
+
+
+
+    window.customElements.define(ViewResults.is, ViewResults);
+  </script>
+</dom-module>
+
+

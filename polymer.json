@@ -2,7 +2,14 @@
   "entrypoint": "index.html",
   "shell": "src/my-app.html",
   "fragments": [
-    "src/splash-screen.html",
+    "src/edit-answers.html",
+    "src/edit-module.html",
+    "src/form-validators.html",
+    "src/module-list.html",
+    "src/my-auth.html",
+    "src/my-icons.html",
+    "src/positions-list.html",
+    "src/sign-up.html",
     "src/my-settings.html",
     "src/my-auth.html",
     "src/my-positions.html",
@@ -10,7 +17,9 @@
     "src/my-employees.html",
     "src/my-view404.html",
     "src/my-organization.html",
-    "src/sign-up.html"
+    "src/sign-up.html",
+    "src/view-results.html"
+
   ],
   "sources": [
     "images/**/*",

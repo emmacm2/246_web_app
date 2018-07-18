@@ -33,7 +33,7 @@
         <div class="card">
             <h1>Edit Answers - [[questionTitle]]</h1>
             <firebase-document
-                    app-name="cabooseBE"
+
                     id="answerSync">
             </firebase-document>
 
@@ -42,7 +42,7 @@
 
                     <firebase-query
                             id="query"
-                            app-name="cabooseBE"
+
                             path="/Questions/[[orgId]]/[[moduleId]]/[[questionId]]/Answers"
                             data="{{answerList}}">
                     </firebase-query>

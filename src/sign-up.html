@@ -5,164 +5,203 @@
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/gold-phone-input/gold-phone-input.html">
 <link rel="import" href="../bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
 
 
 <link rel="import" href="./form-validators.html">
 
 
 <dom-module id="sign-up">
-    <template>
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+        width: 800px;
+      }
 
-        <style include="shared-styles">
-            :host {
-                display: block;
-                padding: 10px;
-                width: 800px;
-            }
-        </style>
-        <firebase-auth id="signUp" app-name="cabooseBE" user="{{user}}"></firebase-auth>
+      paper-input {
+        padding-bottom: 15px;
+      }
+    </style>
+    <firebase-document
 
-        <div class="card">
-            <h1>Sign Up</h1>
-            <form id="form" is="iron-form">
+        id="NewUserSync">
+    </firebase-document>
 
-                <password-validator
-                        error-message="{{passwordErrorMessage}}">
-                </password-validator>
+    <firebase-auth id="signUp" app-name="cabooseBE" user="{{user}}"></firebase-auth>
 
-                <equality-validator
-                        validator-name="repeat_password_validator"
-                        check-equal-to="{{newUser.password}}">
-                </equality-validator>
+    <div class="card">
+      <h1>Sign Up</h1>
+      <form id="form" is="iron-form">
 
-                <equality-validator
-                        validator-name="repeat_email_validator"
-                        check-equal-to="{{newUser.email}}">
-                </equality-validator>
+        <password-validator
+            error-message="{{passwordErrorMessage}}">
+        </password-validator>
 
+        <equality-validator
+            validator-name="repeat_password_validator"
+            check-equal-to="{{newUser.password}}">
+        </equality-validator>
 
-                <paper-input
-                        id="displayName"
-                        error-message="Display name required"
-                        always-float-label
-                        label="Display Name"
-                        value="{{newUser.name}}"
-                        required></paper-input>
-
-                <paper-input
-                        id="companyName"
-                        error-message="Company name required"
-                        always-float-label
-                        label="Company Name"
-                        value="{{newUser.companyName}}"
-                        required>
-                </paper-input>
-
-                <paper-input id="email"
-                             type="email"
-                             always-float-label
-                             label="Email"
-                             value="{{newUser.email}}"
-                             error-message="Please enter a valid email address"
-                             required>
-                </paper-input>
-
-                <paper-input id="emailCheck"
-                             type="text"
-                             always-float-label
-                             label="Retype Email"
-                             validator="repeat_email_validator"
-                             error-message="Email addresses do not match"
-                             required>
-                </paper-input>
-
-                <gold-phone-input
-                        id="phone"
-                        error-message="Invalid US phone number"
-                        value="{{newUser.phone}}"></gold-phone-input>
-
-                <paper-input
-                        id="password"
-                        validator="password-validator"
-                        type="password"
-                        error-message="[[passwordErrorMessage]]"
-                        label="Your password"
-                        value="{{newUser.password}}">
-                </paper-input>
-
-                <paper-input
-                        id="checkPassword"
-                        type="password"
-                        validator="repeat_password_validator"
-                        label="Repeat password"
-                        error-message="Passwords do not match"
-                        required>
-                </paper-input>
-
-                <paper-button on-click="_validate" raised>
-                    Submit
-                </paper-button>
-
-            </form>
-        </div>
-
-    </template>
-
-    <script>
-        class SignUp extends Polymer.Element {
-            static get is() {
-                return 'sign-up';
-            }
-
-            static get properties() {
-                return {
-                    page: {
-                        type: String,
-                    },
-                    user: {
-                        type: Object,
-                    },
-                    newUser: {
-                        type: Object,
-                        value: function() {
-                            return {};
-                        },
-                    },
-                };
-            }
-
-            _onSubmit() {
-                this.$.form.validate();
-            }
-
-            _validate() {
-                this.isValid = this.$.emailCheck.validate();
-                this.isValid = this.$.email.validate();
-                this.isValid = this.$.password.validate();
-                this.isValid = this.$.checkPassword.validate();
-                this.isValid = this.$.phone.validate();
-                this.isValid = this.$.displayName.validate();
-
-                if (this.isValid) {
-                    this._createAccount();
-                }
-            }
-
-            _createAccount() {
-        this.$.signUp.createUserWithEmailAndPassword(this.newUser.email, this.newUser.password)
-                    .then(function() {
+        <equality-validator
+            validator-name="repeat_email_validator"
+            check-equal-to="{{newUser.email}}">
+        </equality-validator>
 
 
-                    })
-                    .catch(function(error) {
-                        console.log('BROKE');
-                    });
+        <paper-input
+            id="displayName"
+            error-message="Display name required"
+            always-float-label
+            label="Display Name"
+            value="{{newUser.displayName}}"
+            required></paper-input>
+
+        <paper-input
+            id="orgName"
+            error-message="Organization name required"
+            always-float-label
+            label="Organization Name"
+            value="{{newUser.companyName}}"
+            required>
+        </paper-input>
+
+        <paper-input id="email"
+                     type="email"
+                     always-float-label
+                     label="Email"
+                     value="{{newUser.email}}"
+                     error-message="Please enter a valid email address"
+                     required>
+        </paper-input>
+
+        <paper-input id="emailCheck"
+                     type="text"
+                     always-float-label
+                     label="Retype Email"
+                     validator="repeat_email_validator"
+                     error-message="Email addresses do not match"
+                     required>
+        </paper-input>
+
+        <gold-phone-input
+            id="phone"
+            error-message="Invalid US phone number"
+            value="{{newUser.phone}}"></gold-phone-input>
+
+        <paper-input
+            id="password"
+            validator="password-validator"
+            type="password"
+            error-message="[[passwordErrorMessage]]"
+            label="Your password"
+            value="{{newUser.password}}">
+        </paper-input>
+
+        <paper-input
+            id="checkPassword"
+            type="password"
+            validator="repeat_password_validator"
+            label="Repeat password"
+            error-message="Passwords do not match"
+            required>
+        </paper-input>
+
+        <paper-button on-click="_validate" raised>
+          Submit
+        </paper-button>
+
+      </form>
+    </div>
+
+  </template>
+
+  <script>
+    class SignUp extends Polymer.Element {
+      static get is() {
+        return 'sign-up';
+      }
+
+      static get properties() {
+        return {
+          page:    {
+            type: String,
+          },
+          user:    {
+            type: Object,
+          },
+          newUser: {
+            type:  Object,
+            value: function() {
+              return {};
+            },
+          },
+        };
+      }
+
+      _onSubmit() {
+        this.$.form.validate();
+      }
+
+      _validate() {
+        this.isValid = this.$.emailCheck.validate();
+        this.isValid = this.$.orgName.validate();
+        this.isValid = this.$.email.validate();
+        this.isValid = this.$.password.validate();
+        this.isValid = this.$.checkPassword.validate();
+        this.isValid = this.$.phone.validate();
+        this.isValid = this.$.displayName.validate();
+
+        if (this.isValid) {
+          this._createAccount();
+        }
+      }
+
+
+      _createAccount() {
+        var _this = this;
+        this.$.signUp.createUserWithEmailAndPassword(this.newUser.email, this.newUser.password).then(function(response) {
+
+
+          var uid = response.uid;
+
+          _this.$.NewUserSync.path = null;
+
+          var OrgData = {};
+          OrgData['Admins'] = {};
+          OrgData.Admins[uid] = true;
+          OrgData['Public'] = {
+            orgName:_this.$.orgName.value
+          };
+
+          _this.$.NewUserSync.data = OrgData;
+          _this.$.NewUserSync.saveValue(`Customer_Orgs/`).then(function(resp){
+            var orgId = _this.$.NewUserSync.path.split('/')[2];
+
+            _this.$.NewUserSync.path = null;
+            var userData = {
+              CustomerOrgId : orgId,
+              email:_this.newUser.email,
+              name: _this.newUser.displayName,
+              phone: _this.newUser.phone
+            };
+
+            console.log(userData);
+
+            _this.$.NewUserSync.data = userData;
+            _this.$.NewUserSync.saveValue(`Customers/`,uid).then(function(){
+              window.location = "/organization";
+            }).catch(function(err){console.log(err)});
+          })
+        }).catch(function(error) {
+          console.log(error);
+        });
+      }
     }
 
-        }
-
-        window.customElements.define(SignUp.is, SignUp);
-    </script>
+    window.customElements.define(SignUp.is, SignUp);
+  </script>
 
 
 </dom-module>

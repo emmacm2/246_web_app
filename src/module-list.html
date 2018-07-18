@@ -22,7 +22,7 @@
         </style>
 
         <firebase-document
-                app-name="cabooseBE"
+
                 id="ModuleListSync">
         </firebase-document>
         <div class="card">
@@ -31,14 +31,14 @@
                 <template is="dom-if" if="{{_isString(orgId)}}">
                     <firebase-query
                             id="query"
-                            app-name="cabooseBE"
+
                             path="/Positions/[[orgId]]/[[positionId]]/modules"
                             data="{{selectedModuleList}}">
                     </firebase-query>
 
                     <firebase-query
                             id="query2"
-                            app-name="cabooseBE"
+
                             path="/Modules/[[orgId]]"
                             data="{{allModuleList}}">
                     </firebase-query>
